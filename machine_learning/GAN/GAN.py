@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-# Dawid Tracz 
- # oświadzcam iż poniższy kod został napisany samodzielnie.
- # 
-
 if True:	#imports
 	import os, sys
 	os.environ['TF_CPP_MIN_LOG_LEVEL']='2'

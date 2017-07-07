@@ -1,4 +1,9 @@
 requires installed python3 with tensorflow and CUDA & cuDNN for GPU calculations
+requires installed libraries:	tqdm		https://pypi.python.org/pypi/tqdm
+								numpy
+								matplotlib
+								scipy
+								skimage
 
 run:
 	./main.py DATASET GPU > resultfile.txt

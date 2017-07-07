@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-# Dawid Tracz 
- # oświadzcam iż poniższy kod został napisany samodzielnie.
- # 
-
 if True:	#imports
 	import signal, sys
 	from tqdm import tqdm, trange
