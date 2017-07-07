@@ -1,3 +1,5 @@
+requires installed python3 with tensorflow and CUDA & cuDNN for GPU calculations
+
 run:
 	./main.py DATASET GPU > resultfile.txt
 	--------------------------------------
