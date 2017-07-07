@@ -1,0 +1,9 @@
+run:
+	./main.py DATASET GPU > resultfile.txt
+	--------------------------------------
+	DATASET = "MNIST" or "CIFAR10"
+	GPU = 1 if '''wanna use GPU''' else 0
+	---------------------------------------
+	CIFAR10 requires to download data set from https://www.cs.toronto.edu/~kriz/cifar.html
+			and extract it to .. directory (python version)
+	MNIST automaticly download necessary data to .. directory 
