@@ -2,6 +2,7 @@
 
 if True:	#imports
 	import matplotlib
+	#matplotlib.use('TkAgg')
 	matplotlib.use('Agg')
 	import os
 	os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
@@ -13,6 +14,13 @@ if True:	#imports
 	import pickle
 
 #-----------------------------------------------------------------------------------------------------
+
+def rand(n, a=1.5):
+	r = np.random.randint(round(a*n+1))
+	if r > n or not a:
+		r = np.random.binomial(n, 0.5)
+	return r
+
 class Data(object):
 	def __init__(self):
 		self.images = None
@@ -79,9 +87,9 @@ class CifarLoader(object):
 			return batch
 		xl, yl = shape[0]-sizes[0], shape[1]-sizes[1]
 		if pos is "rand":
-			xr = np.random.randint(xl) if xl>0 else 0
+			xr = np.random.randint(xl+1) if xl>0 else 0
 			xl -= xr
-			yr = np.random.randint(yl) if yl>0 else 0
+			yr = np.random.randint(yl+1) if yl>0 else 0
 			yl -= yr
 			xr, yr = shape[0]-xr, shape[1]-yr
 		else:
@@ -93,21 +101,24 @@ class CifarLoader(object):
 		batch = batch[:,xl:xr,yl:yr,:]
 		return batch
 
-	def get_batches(self, batch_size, mode="train", sizes=(32,32), rotations=False):
+	def get_batches(self, batch_size, mode="train", sizes=(32,32), pos=False, rotations=False):
 		data_set = self.test if mode=="test" else self.train
+		if not pos:
+			pos = "rand" if mode=="train" else (0,0)
 		rand = np.arange(len(data_set.images))
 		np.random.shuffle(rand)
 		images, labels = data_set.images[rand], data_set.labels[rand]
 		if rotations:
 			images = self.scale_and_rotate_image(images)
 		spt = [batch_size*(i+1) for i in range(int(len(labels)/batch_size))]
+		#images = self.cut(images, sizes, pos)
 		images = np.split(images, spt)
 		labels = np.split(labels, spt)
-		for i in range(len(images)-1):
+		for i in range(len(images)-1): # we want every batch cuted different
 			images[i] = self.cut(images[i], sizes)
 		return images[:-1], labels[:-1]
 
-	def display(self, imgs, lbls=None, x=2, y=2, directory="./", filename="konv_CIFAR10"):
+	def display(self, imgs, lbls=None, x=2, y=2, directory="./", filename=None):
 		imgs = (imgs+1)/2
 		if lbls is not None:
 			lbls = np.argmax(lbls, axis=1)
@@ -118,8 +129,12 @@ class CifarLoader(object):
 				axes1[j][k].imshow(toimage(imgs[j*y+k]), interpolation='none')
 				if lbls is not None:
 					axes1[j][k].set_title(self.dict[lbls[j*y+k]], fontsize=100)
-		plt.savefig(directory+filename+".png")
-		plt.close('all')
+		if not filename:
+			print("!!!")
+			plt.show()
+		else:
+			plt.savefig(directory+filename+".png")
+			plt.close('all')
 
 #-----------------------------------------------------------------------------------------------------
 
@@ -127,7 +142,7 @@ class MnistLoader(object):
 	def subload(self, dat_set):
 		data = Data()
 		data.images = dat_set.images.reshape([-1,1,28,28]).transpose(0,2,3,1)
-		data.images = data.images*2 - 1
+		data.images = data.images*2 - 1  # [0,1] --> [-1,1]
 		data.labels = dat_set.labels
 		return data
 
@@ -160,9 +175,9 @@ class MnistLoader(object):
 			return batch
 		xl, yl = shape[0]-sizes[0], shape[1]-sizes[1]
 		if pos is "rand":
-			xr = np.random.randint(xl) if xl>0 else 0
+			xr = np.random.randint(xl+1) if xl>0 else 0
 			xl -= xr
-			yr = np.random.randint(yl) if yl>0 else 0
+			yr = np.random.randint(yl+1) if yl>0 else 0
 			yl -= yr
 			xr, yr = shape[0]-xr, shape[1]-yr
 		else:
@@ -189,7 +204,7 @@ class MnistLoader(object):
 		return images[:-1], labels[:-1]
 
 	def display(self, imgs, lbls=None, x=2, y=2, directory="./", filename="konv_MNIST"):
-		imgs = (imgs+1)/2
+		imgs = (imgs+1)/2  # [0,1] <-- [-1,1]
 		imgs = 1 - imgs
 		imgs = imgs.reshape(-1, 28, 28)
 		if lbls is not None:
