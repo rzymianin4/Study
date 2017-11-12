@@ -100,9 +100,9 @@ class Trainer(object):
 
     def _train_G(self, batch_size, noise_size, mean, var):
         ans_F = 0
+        noise = self.get_noise(batch_size, noise_size, mean, var)
+        glbs = self.get_labels(batch_size)
         while ans_F < 0.5:
-            noise = self.get_noise(batch_size, noise_size, mean, var)
-            glbs = self.get_labels(batch_size)
             glG, loss_G, ans_F = self.sess.run((self.gradloss_G, self.loss_G, self.preds_F), 
                                      feed_dict={self.noise: noise, self.glbs: glbs})
             ans_F = np.mean(ans_F)
